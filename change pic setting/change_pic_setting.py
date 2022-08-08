@@ -5,20 +5,20 @@ import pandas as pd
 import shutil
 
 
-def listPicFileInfo(dirName):
+def listPicFileInfo(src_dir_path):
     '''
     目的: 得到指定資料夾圖片檔的明細
 
     設定參數:
-    dirName:照片存檔的資料夾路徑
+    src_dir_path:照片存檔的資料夾路徑
     
     '''
-    #dirName = "C:\\Users\\runra\Desktop\\test\\"   #最後要加雙斜線,不然會報錯
-    li=os.listdir(dirName)
+    #src_dir_path = "C:/Users/runra/Desktop/test/"   #記得改用 / 反斜線
+    li=os.listdir(src_dir_path)
 
     for ims in li:
-        im = Image.open(dirName+ims)
-        size = os.path.getsize(dirName+ims)
+        im = Image.open(src_dir_path+ims)
+        size = os.path.getsize(src_dir_path+ims)
         nx, ny = im.size
         f = im.format
         
@@ -31,18 +31,18 @@ def listPicFileInfo(dirName):
                                                     ims,nx,ny,f,size/1024,"No DPI data. Invalid Image header"))
         im.close()
 
-def changeDpi(dirName,newDpi):
+def changeDpi(src_dir_path,newDpi):
     '''
     目的: 改資料夾內jpg圖片的dpi,並另存新檔後加dpi規格說明
 
     設定參數:
-    dirName:照片存檔的資料夾路徑
+    src_dir_path:照片存檔的資料夾路徑
     newDip:要另存設定的的新dpi
     '''
-    #dirName = "C:\\Users\\runra\Desktop\\test\\"   #最後要加雙斜線,不然會報錯
-    li=os.listdir(dirName)
+    #src_dir_path = "C:/Users/runra/Desktop/test/"   #記得改用 / 反斜線
+    li=os.listdir(src_dir_path)
     for ims in li:
-        im = Image.open(dirName+ims)
+        im = Image.open(src_dir_path+ims)
         nx, ny = im.size
         f = im.format
         print("原始照片尺寸: ",nx,"x",ny,"圖片格式: ",f)
@@ -57,26 +57,26 @@ def changeDpi(dirName,newDpi):
             print('No DPI data. Invalid Image header')
             #print(im.info)
         
-    #newDpi=300  #設定新的dpi
-    newFileName=fileName[0]+"_"+str(newDpi)+"dpi"+".jpg"        #另存新檔
-    #newFileName=fileName[0]+".jpg"                             #直接覆蓋
-    im.save(f"{dirName}/"+newFileName,dpi=(newDpi,newDpi),quality=100)
-    im.close()
-    print("資料夾內檔案轉換結束!")
+        #newDpi=300  #設定新的dpi
+        newFileName=fileName[0]+"_"+str(newDpi)+"dpi"+".jpg"        #另存新檔
+        #newFileName=fileName[0]+".jpg"                             #直接覆蓋
+        im.save(f"{src_dir_path}/"+newFileName,dpi=(newDpi,newDpi),quality=100)
+        im.close()
+    print("資料夾jpg檔案轉換成",newDpi,"dpi結束!")
 
 
-def changePicSize(dirName,max_width):
+def changePicSize(src_dir_path,max_width):
     '''
     目的: 等比例放大/縮小圖片
 
     設定參數:
-    dirName:照片存檔的資料夾路徑
+    src_dir_path:照片存檔的資料夾路徑
     max :輸入指定寬度
     '''
-    #dirName = "C:\\Users\\runra\Desktop\\test\\"   #最後要加雙斜線,不然會報錯
-    li=os.listdir(dirName)
+    #src_dir_path = "C:/Users/runra/Desktop/test/"   #記得改用 / 反斜線
+    li=os.listdir(src_dir_path)
     for ims in li:
-        im = Image.open(dirName+ims)
+        im = Image.open(src_dir_path+ims)
         width,height = im.size
         #max = 200                     # 指定寬最大的數值
         scale = height/width           # 設定 scale 為 height/width
@@ -87,56 +87,56 @@ def changePicSize(dirName,max_width):
         fileName=ims.split(".")
         newFileName=fileName[0]+"_"+"width"+str(max_width)+".jpg"   #另存新檔
         #newFileName=fileName[0]+".jpg"                             #直接覆蓋
-        im2.save(f"{dirName}/"+newFileName,quality=100) 
+        im2.save(f"{src_dir_path}/"+newFileName,quality=100) 
         im.close()
         print(ims,"圖片放大/縮小結束!")
 
 
 
-def changeFileName(filepath,dirName):
+def changeFileName(xls_file_path,src_dir_path):
     '''
     目的: 更改檔名
 
     設定參數:
-    filepath:放old,new檔名xls檔的位置,不要跟圖片檔同一個資料夾
-    dirName:照片存檔的資料夾路徑
+    xls_file_path:放old,new檔名xls檔的位置,不要跟圖片檔同一個資料夾
+    src_dir_path:照片存檔的資料夾路徑
     filename.xls :新增一個xls檔案,內放二欄'old','new'檔名資料
     '''
-    #filepath="C:\\Users\\runra\Desktop\\test\\"        #放old,new檔名xls檔的位置
-    #dirName = "C:\\Users\\runra\Desktop\\test\pic\\"   #最後要加雙斜線,不然會報錯
+    #xls_file_path="C:/Users/runra/Desktop/test/"        #放old,new檔名xls檔的位置
+    #src_dir_path = "C:/Users/runra/Desktop/test/pic/"   #記得改用 / 反斜線
 
-    file=pd.read_excel(filepath+"filename.xls")
+    file=pd.read_excel(xls_file_path+"filename.xls")
     #print(file.head())
     old=set(file['old'].tolist())
     file.set_index("old" , inplace=True)
 
-    li=os.listdir(dirName)
+    li=os.listdir(src_dir_path)
     for ims in li:
         if ims in old:
             fileName=ims.split(".") 
             new=file.loc[ims].new
-            os.rename(f"{dirName}/"+ims,f"{dirName}/"+new)   
+            os.rename(f"{src_dir_path}/"+ims,f"{src_dir_path}/"+new)   
         else:
             print(ims,"未改名!")
         
     print("圖片更名結束!")
 
-def changePNG_to_JPG(dirName):
+def changePNG_to_JPG(src_dir_path):
     '''
     目的: PNG另存jpg
 
     設定參數:
-    dirName:照片存檔的資料夾路徑
+    src_dir_path:照片存檔的資料夾路徑
     
     '''
-    #dirName = "C:\\Users\\runra\Desktop\\test\pic\\"   #最後要加雙斜線,不然會報錯
+    #src_dir_path = "C:/Users/runra/Desktop/test/pic/"   #最後要加雙斜線,不然會報錯
 
-    li=os.listdir(dirName)
+    li=os.listdir(src_dir_path)
     for ims in li:
         fileName=ims.split(".")
-        im = Image.open(dirName+ims)
+        im = Image.open(src_dir_path+ims)
         newFileName=fileName[0]+".jpg"   #另存新檔
-        im.save(f"{dirName}/"+newFileName,quality=100) 
+        im.save(f"{src_dir_path}/"+newFileName,quality=100) 
         im.close()
     print("PNG圖片另存jpg結束!")
 
@@ -146,16 +146,16 @@ def picFileCopy():
 
     設定參數:
     filename.xls :新增一個xls檔案,只要old那欄要抓取檔案的名稱。(要含.jpg)
-    dirName:照片存檔的資料夾路徑
-    finalLoc:目的資料夾
+    src_dir_path:照片存檔的資料夾路徑
+    to_dir_path:目的資料夾
     '''
 
     
-    src_dir_path = 'C:/Users/runra/Desktop/test2/'        # 源文件夹
+    src_dir_path = 'C:/Users/runra/Desktop/test2/'        # 源文件夾
     
-    to_dir_path = 'C:/Users/runra/Desktop/test3/'         # 存放复制文件的文件夹
+    to_dir_path = 'C:/Users/runra/Desktop/test3/'         # 存放覆制文件的文件夾
     
-    key = 'a1'                 # 源文件夹中的文件包含字符key则复制到to_dir_path文件夹中
+    key = 'a1'                 # 源文件夾中的文件包含字符key則覆制到to_dir_path文件夾中
     
     if not os.path.exists(to_dir_path):
         print("to_dir_path not exist,so create the dir")
@@ -180,15 +180,15 @@ def picFileCopy():
 '''
 
 
-filepath="C:\\Users\\runra\Desktop\\test3\\"        #放old,new檔名xls檔的位置
-#dirName = "C:\\Users\\runra\Desktop\\test\pic\\"  #最後要加雙斜線,不然會報錯
-dirName = "C:\\Users\\runra\Desktop\\test2\\"      #最後要加雙斜線,不然會報錯
-finalLoc= "C:\\Users\\runra\Desktop\\test3\\"      #另存新檔的位置
+xls_file_path="C:/Users/runra/Desktop/test3/"            #變更檔名時，放old,new檔名xls的位置
+#src_dir_path = "C:/Users/runra/Desktop/test/pic/"  #記得改用 / 反斜線
+src_dir_path = "C:/Users/runra/Desktop/test2/"      #源文件位置,記得改用 / 反斜線
+to_dir_path= "C:/Users/runra/Desktop/test3/"        #另存新檔的位置
 
-#listPicFileInfo(dirName)            #得到指定資料夾圖片檔的明細
-#changeDpi(dirName,300)              #改變指定資料夾圖片dpi
-#changePicSize(dirName,450)          #變更指定資料夾內,指定圖片寬度，等比例放大/縮小
-#changeFileName(filepath,dirName)    #大量更改檔名
-#changePNG_to_JPG(dirName)           #png 另存jpg
-picFileCopy()
+#listPicFileInfo(src_dir_path)            #得到指定資料夾圖片檔的明細
+#hangeDpi(src_dir_path,300)               #改變指定資料夾圖片dpi
+#changePicSize(src_dir_path,450)          #變更指定資料夾內,指定圖片寬度，等比例放大/縮小
+#changeFileName(xls_file_path,src_dir_path)    #大量更改檔名
+#changePNG_to_JPG(src_dir_path)           #png 另存jpg
+#picFileCopy()                            #copy指定關鍵字檔案
 
