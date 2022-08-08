@@ -1,8 +1,41 @@
 from PIL import Image
-import tempfile
+#import tempfile
 import os
 import pandas as pd
 import shutil
+
+
+def picFileCopy(xls_file_path,src_dir_path,to_dir_path):
+    '''
+    目的: 找到包含指定關鍵字的檔案,並另複制到其他資料夾
+
+    設定參數:
+    filename.xls :新增一個xls檔案,只要old那欄要抓取檔案的名稱。(不用含副檔名.jpg)
+    src_dir_path:照片存檔的資料夾路徑
+    to_dir_path:目的資料夾
+    '''
+
+    #src_dir_path = 'C:/Users/runra/Desktop/test2/'        # 源文件夾
+    #to_dir_path = 'C:/Users/runra/Desktop/test3/'         # 存放複製文件的文件夾
+    #key = 'a1'                 # 源文件夾中的文件包含字符key則覆制到to_dir_path文件夾中
+    
+
+    if not os.path.exists(to_dir_path):
+        print("to_dir_path not exist,so create the dir")
+        os.mkdir(to_dir_path, 1)
+    if os.path.exists(src_dir_path):
+        print("src_dir_path exist")
+
+        file=pd.read_excel(xls_file_path+"filename.xls")
+        for key in file['old']:
+            for file in os.listdir(src_dir_path):
+                # is file
+                if os.path.isfile(src_dir_path+'/'+file):
+                    if key in file:
+                        print('找到包含"'+key+'"關鍵字的文件,絕對路徑為----->'+src_dir_path+'/'+file)
+                        print('複製到----->'+to_dir_path+file)
+                        shutil.copy(src_dir_path+'/'+file, to_dir_path+'/'+file)# 移動用move函数
+
 
 
 def listPicFileInfo(src_dir_path):
@@ -100,7 +133,7 @@ def changeFileName(xls_file_path,src_dir_path):
     設定參數:
     xls_file_path:放old,new檔名xls檔的位置,不要跟圖片檔同一個資料夾
     src_dir_path:照片存檔的資料夾路徑
-    filename.xls :新增一個xls檔案,內放二欄'old','new'檔名資料
+    filename.xls :新增一個xls檔案,內放二欄'old','new'檔名資料,old欄要寫含副檔名的完整名稱
     '''
     #xls_file_path="C:/Users/runra/Desktop/test/"        #放old,new檔名xls檔的位置
     #src_dir_path = "C:/Users/runra/Desktop/test/pic/"   #記得改用 / 反斜線
@@ -121,6 +154,8 @@ def changeFileName(xls_file_path,src_dir_path):
         
     print("圖片更名結束!")
 
+
+
 def changePNG_to_JPG(src_dir_path):
     '''
     目的: PNG另存jpg
@@ -140,35 +175,7 @@ def changePNG_to_JPG(src_dir_path):
         im.close()
     print("PNG圖片另存jpg結束!")
 
-def picFileCopy():
-    '''
-    目的: 找到包含指定關鍵字的檔案,並另複制到其他資料夾
 
-    設定參數:
-    filename.xls :新增一個xls檔案,只要old那欄要抓取檔案的名稱。(要含.jpg)
-    src_dir_path:照片存檔的資料夾路徑
-    to_dir_path:目的資料夾
-    '''
-
-    
-    src_dir_path = 'C:/Users/runra/Desktop/test2/'        # 源文件夾
-    
-    to_dir_path = 'C:/Users/runra/Desktop/test3/'         # 存放覆制文件的文件夾
-    
-    key = 'a1'                 # 源文件夾中的文件包含字符key則覆制到to_dir_path文件夾中
-    
-    if not os.path.exists(to_dir_path):
-        print("to_dir_path not exist,so create the dir")
-        os.mkdir(to_dir_path, 1)
-    if os.path.exists(src_dir_path):
-        print("src_dir_path exist")
-        for file in os.listdir(src_dir_path):
-            # is file
-            if os.path.isfile(src_dir_path+'/'+file):
-                if key in file:
-                    print('找到包含"'+key+'"字符的文件,绝对路径为----->'+src_dir_path+'/'+file)
-                    print('复制到----->'+to_dir_path+file)
-                    shutil.copy(src_dir_path+'/'+file, to_dir_path+'/'+file)# 移动用move函数
 
 
 
@@ -180,15 +187,18 @@ def picFileCopy():
 '''
 
 
-xls_file_path="C:/Users/runra/Desktop/test3/"            #變更檔名時，放old,new檔名xls的位置
+xls_file_path="C:/Users/runra/Desktop/test3/"       #變更檔名時，放old,new檔名xls的位置
 #src_dir_path = "C:/Users/runra/Desktop/test/pic/"  #記得改用 / 反斜線
 src_dir_path = "C:/Users/runra/Desktop/test2/"      #源文件位置,記得改用 / 反斜線
 to_dir_path= "C:/Users/runra/Desktop/test3/"        #另存新檔的位置
 
-#listPicFileInfo(src_dir_path)            #得到指定資料夾圖片檔的明細
-#hangeDpi(src_dir_path,300)               #改變指定資料夾圖片dpi
-#changePicSize(src_dir_path,450)          #變更指定資料夾內,指定圖片寬度，等比例放大/縮小
+
+
+picFileCopy(xls_file_path,src_dir_path,to_dir_path)       #copy指定關鍵字檔案
+#listPicFileInfo(src_dir_path)                 #得到指定資料夾圖片檔的明細
+#hangeDpi(src_dir_path,300)                    #改變指定資料夾圖片dpi
+#changePicSize(src_dir_path,450)               #變更指定資料夾內,指定圖片寬度，等比例放大/縮小
 #changeFileName(xls_file_path,src_dir_path)    #大量更改檔名
-#changePNG_to_JPG(src_dir_path)           #png 另存jpg
-#picFileCopy()                            #copy指定關鍵字檔案
+#changePNG_to_JPG(src_dir_path)                #png 另存jpg
+
 
